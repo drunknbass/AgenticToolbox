@@ -1,0 +1,79 @@
+{
+  "build": {
+    "maxIssues": 10,
+    "weights": {
+      "complexity": 1,
+      "performance": 1,
+      "style": 1
+    }
+  },
+  "processors": {
+    "active": true,
+    "config": {
+      "includes": ["**/*.kt", "**/*.kts"],
+      "excludes": ["**/build/**"]
+    }
+  },
+  "console-reports": {
+    "active": true,
+    "exclude": [],
+    "output": ["stdout"]
+  },
+  "output-reports": {
+    "active": true,
+    "exclude": [],
+    "output": ["html", "xml"]
+  },
+  "ruleset": {
+    "active": true,
+    "rules": {
+      "complexity": {
+        "active": true,
+        "LongParameterList": {
+          "active": true,
+          "threshold": 6
+        },
+        "LongMethod": {
+          "active": true,
+          "threshold": 60
+        },
+        "LargeClass": {
+          "active": true,
+          "threshold": 600
+        },
+        "ComplexMethod": {
+          "active": true,
+          "threshold": 15
+        },
+        "NestedBlockDepth": {
+          "active": true,
+          "threshold": 4
+        },
+        "TooManyFunctions": {
+          "active": true,
+          "thresholdInFiles": 11,
+          "thresholdInClasses": 11,
+          "thresholdInInterfaces": 11,
+          "thresholdInObjects": 11,
+          "thresholdInEnums": 11
+        }
+      },
+      "performance": {
+        "active": true
+      },
+      "style": {
+        "active": true,
+        "MaxLineLength": {
+          "active": true,
+          "maxLineLength": 120
+        },
+        "WildcardImport": {
+          "active": true
+        },
+        "NoWildcardImports": {
+          "active": false
+        }
+      }
+    }
+  }
+}
