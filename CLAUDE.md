@@ -35,19 +35,26 @@ The AgenticToolbox aims to:
 - **NO Claude attribution in PRs**: Pull requests should not mention AI assistance
 - This is enforced via `.claude/settings.json` configuration
 
-### 2. Agent Design Principles
+### 2. Modern API Policy (Critical for Swift/iOS Agents)
+- **ALWAYS prefer newest APIs**: Default to iOS 26 beta APIs when available
+- **iOS 18+ minimum**: Never use iOS 15/16/17 patterns in new code
+- **Research modern replacements**: When APIs feel verbose, newer ones usually exist
+- **Beta by default**: Use beta features with availability checks over stable but outdated APIs
+- See `settings/swift/modern-api-guidelines.md` for comprehensive rules
+
+### 3. Agent Design Principles
 - **Single Responsibility**: Each agent focuses on one domain of expertise
 - **Self-Contained**: Agents include all necessary context and examples
 - **Production-Ready**: Code examples should be immediately usable
 - **Tool-Aware**: Agents specify which tools they need (Read, Write, Grep, etc.)
 
-### 3. Code Quality Standards
+### 4. Code Quality Standards
 - **Type Safety**: Prefer strongly-typed languages and strict configurations
 - **Modern Patterns**: Use current best practices and latest stable APIs
 - **Performance First**: Consider performance implications in all suggestions
 - **Security by Default**: Embed security considerations into every recommendation
 
-### 4. Documentation Requirements
+### 5. Documentation Requirements
 - **Clear Mission Statement**: Each agent must define its purpose clearly
 - **Practical Examples**: Include working code snippets and templates
 - **Decision Rationale**: Explain the "why" behind recommendations
