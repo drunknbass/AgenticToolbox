@@ -68,6 +68,13 @@ struct PlayerBarModifier: ViewModifier {
 ### 2. Collapsible Tab Bar with Bottom Accessory
 Hide tab bar on scroll while maintaining bottom accessory positioning.
 
+**Important Glass Considerations for tabViewBottomAccessory:**
+- The accessory automatically renders inside a glass bubble - don't add another
+- Avoid `.background()` modifiers - they conflict with the glass bubble
+- If backgrounds are necessary, use sparingly with `.ultraThinMaterial`
+- Never apply `.glassEffect()` to content inside the accessory
+- Use `.glass` or `.glassProminent` button styles for buttons inside accessories
+
 ```swift
 struct RootTabs: View {
     @State private var selection = 0
@@ -115,8 +122,11 @@ struct NowPlayingAccessory: View {
             Button { /* expand */ } label: { 
                 Image(systemName: "chevron.up") 
             }
+            .buttonStyle(.glass) // Use glass button style in accessories
         }
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        // IMPORTANT: Avoid backgrounds in tabViewBottomAccessory
+        // The accessory already renders in a glass bubble
+        // If needed, use sparingly with translucent options like .ultraThinMaterial
     }
 }
 ```
@@ -184,7 +194,7 @@ struct AppTabs: View {
             view
                 .tabBarMinimizeBehavior(.onScrollDown)
                 .tabViewBottomAccessory {
-                    MiniPlayerAccessory()
+                    MiniPlayerAccessory() // No additional glass or heavy backgrounds
                 }
         }
     }
@@ -193,8 +203,62 @@ struct AppTabs: View {
 
 ## Additional Verified iOS 26 APIs
 
-### Glass Effect (Limited)
-The only verified glass-related API:
+### Glass Button Styles
+Apply glass styling to buttons for consistent Liquid Glass appearance:
+
+```swift
+@available(iOS 26, *)
+struct GlassButtons: View {
+    var body: some View {
+        VStack(spacing: 20) {
+            // Standard glass button
+            Button("Standard Glass") { /* action */ }
+                .buttonStyle(.glass)
+            
+            // Prominent glass button for primary actions
+            Button("Prominent Glass") { /* action */ }
+                .buttonStyle(.glassProminent)
+            
+            // Custom button with glass style
+            Button { 
+                /* action */ 
+            } label: {
+                Label("Play", systemImage: "play.fill")
+            }
+            .buttonStyle(.glass)
+        }
+    }
+}
+```
+
+### GlassEffectTransition
+Describes changes when glass effects are added/removed from view hierarchy:
+
+```swift
+@available(iOS 26, *)
+struct AnimatedGlass: View {
+    @State private var showGlass = false
+    
+    var body: some View {
+        VStack {
+            Text("Morphing Content")
+                .padding()
+        }
+        .glassEffect(
+            showGlass ? .regular : .clear,
+            in: .capsule
+        )
+        .glassEffectTransition(.scale.combined(with: .opacity))
+        .onTapGesture {
+            withAnimation(.spring(duration: 0.5)) {
+                showGlass.toggle()
+            }
+        }
+    }
+}
+```
+
+### Glass Effect
 
 ```swift
 @available(iOS 26, *)
@@ -234,6 +298,8 @@ struct GlassGroup: View {
 ### DO's
 - ✅ Use `safeAreaBar` for persistent edge UI
 - ✅ Use `tabBarMinimizeBehavior` with `tabViewBottomAccessory`
+- ✅ Apply `.glass` or `.glassProminent` button styles in glass contexts
+- ✅ Use `GlassEffectTransition` for smooth glass morphing animations
 - ✅ Create Tab with `role: .search` for morphing search
 - ✅ Wrap search tabs in `NavigationStack`
 - ✅ Provide iOS 18-25 fallbacks with `safeAreaInset`
@@ -241,6 +307,9 @@ struct GlassGroup: View {
 
 ### DON'Ts
 - ❌ Don't overload `toolbar(.bottomBar)` for persistent bars
+- ❌ Don't add backgrounds to `tabViewBottomAccessory` content (already in glass bubble)
+- ❌ Don't apply glass effects to views inside `tabViewBottomAccessory`
+- ❌ Don't use shape backgrounds in accessories (conflicts with glass bubble)
 - ❌ Don't simulate tab behaviors with offset/opacity hacks
 - ❌ Don't build fake search tabs with custom bars
 - ❌ Don't break iOS 18-25 compatibility
@@ -315,6 +384,9 @@ extension View {
 ## References
 - [WWDC 2025: Meet Liquid Glass](https://developer.apple.com/wwdc25/219)
 - [Apple: glassEffect View Modifier](https://developer.apple.com/documentation/swiftui/view/glasseffect(_:in:))
+- [Apple: GlassButtonStyle](https://developer.apple.com/documentation/swiftui/glassbuttonstyle)
+- [Apple: GlassProminentButtonStyle](https://developer.apple.com/documentation/swiftui/glassprominentbuttonstyle)
+- [Apple: GlassEffectTransition](https://developer.apple.com/documentation/swiftui/glasseffecttransition)
 - [WWDC 2025: Build a SwiftUI app with the new design](https://developer.apple.com/videos/play/wwdc2025/323/)
 
 ## Example Invocation
