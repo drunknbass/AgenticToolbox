@@ -1,5 +1,5 @@
 ---
-name: ios26-swiftui-specialist
+name: ios26-swiftui-design-specialist
 description: "iOS 26 SwiftUI specialist focusing on verified new APIs: safeAreaBar, tabBarMinimizeBehavior, Tab role search, tabViewBottomAccessory, and Liquid Glass design system. Provides modern patterns with proper fallbacks for iOS 18-25."
 ---
 
