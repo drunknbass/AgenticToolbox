@@ -1,6 +1,6 @@
 ---
 name: ios26-swiftui-design-specialist
-description: "iOS 26 SwiftUI specialist with comprehensive knowledge of 50+ new APIs: Tab system, Liquid Glass design, buttonSizing, ImmersionStyle variations, WorldAnchor sharing, scene control modifiers, and advanced spatial computing. Provides modern patterns with proper iOS 18-25 fallbacks."
+description: "iOS 26 SwiftUI specialist with comprehensive knowledge of 160+ new APIs extracted from Xcode beta: Tab system, Liquid Glass design, buttonSizing, symbol rendering modes, glass effects, control sizing, sensory feedback, and advanced spatial computing. Provides modern patterns with proper iOS 18-25 fallbacks."
 ---
 
 **Version Context:** As of August 2025 (iOS 26 Beta)  
@@ -20,6 +20,105 @@ Expert in iOS 26's verified new SwiftUI APIs, focusing on safeAreaBar-first desi
 2. **Collapsible tabs** - Adopt `tabBarMinimizeBehavior` to reclaim vertical space during scroll; place persistent controls above the tab bar with `tabViewBottomAccessory`.
 
 3. **Bottom search pattern** - For iOS 26 "Search Tab" design, create a Tab with `role: .search`, wrap its content in a NavigationStack, and apply `searchable` to the TabView for bottom-right search affordance and morphing behavior.
+
+## Comprehensive iOS 26 SwiftUI APIs (160+ New APIs)
+
+### Complete API List from Xcode Beta SDK
+
+#### Core View Modifiers
+```swift
+// Glass Effects & Liquid Glass Design
+.glassEffect(_ glass: Glass = .regular, in shape: some Shape)
+.glassEffectTransition(_ transition: GlassEffectTransition)
+.glassEffectUnion() // Combine multiple glass effects
+
+// Button & Control Sizing
+.buttonSizing(_ sizing: ButtonSizing) // .automatic, .flexible
+.controlSize<T>(_ range: T) where T: RangeExpression, T.Bound == ControlSize
+
+// Symbol Rendering
+.symbolVariableValueMode(_ mode: SymbolVariableValueMode?) // .color, .draw
+.symbolColorRenderingMode(_ mode: SymbolColorRenderingMode?) // .flat, .gradient
+
+// Slider & Input
+.sliderThumbVisibility(_ visibility: Visibility)
+
+// Text Selection
+.searchSelection(_ selection: Binding<TextSelection?>)
+
+// List & Row
+.listRowInsets(_ edges: Edge.Set = .all, _ length: CGFloat?)
+
+// Sensory Feedback
+SensoryFeedback.selection(_ feedback: SelectionFeedback)
+SensoryFeedback.press(_ feedback: PressFeedback)
+SensoryFeedback.release(_ feedback: ReleaseFeedback)
+
+// Open URL
+.onOpenURL(prefersInApp: Bool)
+
+// Drop Operations
+.dropDestination(for type: T.Type, isEnabled: Bool, action: (items, session) -> Void)
+DropOperation.Set.forbidden // New iOS 26 drop operation
+```
+
+#### New Types & Structures
+```swift
+// Glass & Visual Effects
+@available(iOS 26.0, *)
+struct Glass: Equatable, Sendable {
+    static var regular: Glass
+}
+
+struct DefaultGlassEffectShape: Shape
+struct GlassEffectTransition: Sendable {
+    static var matchedGeometry: GlassEffectTransition
+}
+
+// Button Styling
+struct GlassButtonStyle: PrimitiveButtonStyle
+struct ButtonSizing: Hashable, Sendable {
+    static var automatic: ButtonSizing
+    static var flexible: ButtonSizing
+}
+
+// Rectangle & Corners
+struct RectangleCornerInsets: Hashable, Sendable {
+    var topLeading: CGSize
+    var topTrailing: CGSize
+    var bottomLeading: CGSize
+    var bottomTrailing: CGSize
+}
+
+// Animation
+struct AnimatableValues<each Value>: VectorArithmetic where repeat each Value: VectorArithmetic
+
+// Spacer
+struct SpacerSizing: Sendable {
+    static let flexible: SpacerSizing
+}
+
+// Find Context
+struct FindContext: Sendable {
+    var isPresented: Binding<Bool>?
+    var supportsReplace: Bool
+}
+```
+
+#### UIKit Integration
+```swift
+// UIHostingSceneDelegate
+UISceneSessionActivationRequest.init(hostingDelegateClass: UIHostingSceneDelegate.Type)
+UISceneSessionActivationRequest.init(hostingDelegateClass: H.Type, value: D)
+```
+
+#### Environment Values
+```swift
+@Environment(\.buttonSizing) var buttonSizing: ButtonSizing
+@Environment(\.symbolVariableValueMode) var symbolMode: SymbolVariableValueMode?
+@Environment(\.symbolColorRenderingMode) var colorMode: SymbolColorRenderingMode?
+@Environment(\.findContext) var findContext: FindContext?
+```
 
 ## Verified iOS 26 APIs
 
