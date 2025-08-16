@@ -1,6 +1,6 @@
 ---
 name: ios26-swiftui-design-specialist
-description: "iOS 26 SwiftUI specialist focusing on verified new APIs: safeAreaBar, tabBarMinimizeBehavior, Tab role search, tabViewBottomAccessory, and Liquid Glass design system. Provides modern patterns with proper fallbacks for iOS 18-25."
+description: "iOS 26 SwiftUI specialist with comprehensive knowledge of 50+ new APIs: Tab system, Liquid Glass design, buttonSizing, ImmersionStyle variations, WorldAnchor sharing, scene control modifiers, and advanced spatial computing. Provides modern patterns with proper iOS 18-25 fallbacks."
 ---
 
 **Version Context:** As of August 2025 (iOS 26 Beta)  
@@ -203,6 +203,125 @@ struct AppTabs: View {
 
 ## Additional Verified iOS 26 APIs
 
+### Button Sizing Modifier
+Control button sizing behavior for consistent layouts with the new `buttonSizing(_:)` modifier:
+
+```swift
+@available(iOS 26, *)
+public enum ButtonSizing {
+    case automatic     // Default: Button sizes to content
+    case fixed        // Fixed size based on control size
+    case fill         // Fill available space
+}
+
+// Usage Examples
+@available(iOS 26, *)
+struct ButtonSizingDemo: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            // Automatic sizing - adapts to content
+            Button("Short") { }
+                .buttonSizing(.automatic)
+                .buttonStyle(.borderedProminent)
+            
+            // Fixed sizing - consistent width regardless of content
+            HStack {
+                Button("Save") { }
+                    .buttonSizing(.fixed)
+                Button("Cancel") { }
+                    .buttonSizing(.fixed)
+            }
+            .buttonStyle(.bordered)
+            
+            // Fill sizing - expands to available width
+            Button("Continue") { }
+                .buttonSizing(.fill)
+                .buttonStyle(.borderedProminent)
+        }
+        .padding()
+    }
+}
+
+// Practical Use Cases
+@available(iOS 26, *)
+struct ToolbarButtons: View {
+    var body: some View {
+        HStack {
+            // Fixed size for icon buttons in toolbar
+            ForEach(["square.and.arrow.up", "heart", "ellipsis"], id: \.self) { icon in
+                Button { } label: {
+                    Image(systemName: icon)
+                }
+                .buttonSizing(.fixed)
+                .buttonStyle(.plain)
+            }
+        }
+    }
+}
+
+@available(iOS 26, *)
+struct FormButtons: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            // Full-width primary action
+            Button("Sign In") { }
+                .buttonSizing(.fill)
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+            
+            // Secondary actions with automatic sizing
+            HStack {
+                Button("Forgot Password?") { }
+                    .buttonSizing(.automatic)
+                Spacer()
+                Button("Create Account") { }
+                    .buttonSizing(.automatic)
+            }
+            .buttonStyle(.plain)
+            .controlSize(.small)
+        }
+    }
+}
+
+// Integration with Control Size
+@available(iOS 26, *)
+struct SizingWithControlSize: View {
+    @State private var controlSize: ControlSize = .regular
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            // Fixed sizing respects control size
+            HStack {
+                Button("Option A") { }
+                    .buttonSizing(.fixed)
+                Button("Option B") { }
+                    .buttonSizing(.fixed)
+                Button("Option C") { }
+                    .buttonSizing(.fixed)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(controlSize)
+            
+            Picker("Size", selection: $controlSize) {
+                Text("Mini").tag(ControlSize.mini)
+                Text("Small").tag(ControlSize.small)
+                Text("Regular").tag(ControlSize.regular)
+                Text("Large").tag(ControlSize.large)
+            }
+            .pickerStyle(.segmented)
+        }
+    }
+}
+```
+
+**Button Sizing Best Practices (iOS 26+ only):**
+- Use `.fixed` for toolbar buttons to maintain consistent spacing
+- Use `.fill` for primary CTAs in forms and sheets
+- Use `.automatic` (default) for text-heavy buttons that need flexibility
+- Combine with `controlSize` for responsive sizing across the app
+- Apply to button groups for uniform appearance
+- For iOS 18-25, use frame modifiers and HStack/Spacer combinations as fallback
+
 ### Glass Button Styles
 Apply glass styling to buttons for consistent Liquid Glass appearance:
 
@@ -292,6 +411,196 @@ struct GlassGroup: View {
     }
 }
 ```
+
+## visionOS 26 Spatial Computing APIs
+
+### Surface Snapping & Persistence
+Windows snap to walls, volumes to tables/floors, with persistence across restarts:
+
+```swift
+@available(visionOS 26, *)
+struct SpatialContentView: View {
+    @Environment(\.surfaceSnappingInfo) var snappingInfo
+    
+    var body: some View {
+        VolumeView {
+            Model3D(named: "object")
+        }
+        .onSurfaceSnap { info in
+            // Handle surface detection
+            switch info.surfaceType {
+            case .horizontal:
+                // Snapped to table/floor
+            case .vertical:
+                // Snapped to wall
+            }
+        }
+        .persistentIdentifier("myVolume")
+    }
+}
+```
+
+### Immersive Environment Behaviors
+Control blending with system environments:
+
+```swift
+@available(visionOS 26, *)
+ImmersiveSpace(id: "workspace") {
+    // 3D content
+}
+.immersiveEnvironmentBehavior(.coexist) // Blend with system
+```
+
+### Advanced Immersion Styles
+Configure progressive immersion with custom parameters:
+
+```swift
+@available(visionOS 26, *)
+struct ImmersiveView: Scene {
+    @State private var immersionStyle: ImmersionStyle = .progressive
+    
+    var body: some Scene {
+        ImmersiveSpace(id: "custom") {
+            // Content
+        }
+        .immersionStyle(selection: $immersionStyle, in: 
+            .mixed,
+            .progressive(0.1...1.0, initialAmount: 0.5, aspectRatio: .portrait),
+            .full
+        )
+    }
+}
+```
+
+### World Anchors with Sharing
+Persistent anchors that can be shared with nearby users:
+
+```swift
+@available(visionOS 26, *)
+struct SharedAnchorView: View {
+    func createSharedAnchor() async {
+        let worldAnchor = WorldAnchor(
+            transform: transform,
+            sharedWithNearbyParticipants: true // Enable SharePlay sharing
+        )
+        // Anchor persists across sessions
+    }
+}
+```
+
+### System Overlay Control
+Manage system UI visibility in immersive experiences:
+
+```swift
+@available(visionOS 26, *)
+WindowGroup {
+    ContentView()
+}
+.persistentSystemOverlays(.hidden) // Hide system overlays
+.upperLimbVisibility(.automatic) // Control hand visibility
+.handTrackingEnabled(true) // Enable hand tracking
+
+### Attachment Anchors for Spatial UI
+Position ornaments in 3D space:
+
+```swift
+@available(visionOS 26, *)
+WindowGroup {
+    ContentView()
+}
+.ornament(attachmentAnchor: .scene(.leading)) {
+    ControlPanel()
+}
+.ornament(attachmentAnchor: .scene(.bottom)) {
+    TimelineView()
+}
+```
+
+### Tab System Enhancements
+
+#### Tab with Role
+Modern tab definition with specialized roles:
+
+```swift
+@available(iOS 26, *)
+TabView {
+    Tab("Home", systemImage: "house") {
+        HomeView()
+    }
+    
+    Tab("Search", systemImage: "magnifyingglass", role: .search) {
+        SearchView() // Automatically positioned on right
+    }
+}
+```
+
+#### TabViewBottomAccessoryPlacement
+Environment value for accessory awareness:
+
+```swift
+@available(iOS 26, *)
+struct AccessoryView: View {
+    @Environment(\.tabViewBottomAccessoryPlacement) var placement
+    
+    var body: some View {
+        // Adapt layout based on placement
+    }
+}
+```
+
+## Complete iOS 26 SwiftUI API Reference
+
+### Core UI & Controls
+- `ButtonSizing` - Enum for button sizing behavior (.automatic, .fixed, .fill)
+- `buttonSizing(_:)` - View modifier for button sizing control
+- `Tab` - Modern tab definition with role support
+- `TabRole` - Specialized tab behaviors (.search)
+
+### Tab View Enhancements
+- `TabViewBottomAccessoryPlacement` - Environment value for accessory placement
+- `TabBarMinimizeBehavior` - Enum for minimize behavior (.onScrollDown, .never, .automatic)
+- `tabViewBottomAccessory` - Persistent content above tab bar (auto-glass wrapped)
+- `tabBarMinimizeBehavior(_:)` - Apply minimize behavior to TabView
+
+### Liquid Glass Design System
+- `.glass` - Standard glass button style
+- `.glassProminent` - Prominent glass button style
+- `glassEffect(_:in:)` - Apply glass material to views (unverified)
+- `GlassEffectContainer` - Group glass elements (unverified)
+- `GlassEffectTransition` - Animate glass changes (unverified)
+
+### Spatial Computing (visionOS 26)
+
+#### Immersive Space APIs
+- `ImmersiveSpace.init(for:makeContent:)` - Enhanced immersive space creation
+- `ImmersiveSpaceContentBuilder` - Result builder for immersive content
+- `RemoteImmersiveSpace` - Mac-to-Vision Pro rendering (development)
+
+#### Immersion Styles
+- `ImmersionStyle` - Enum for immersion types (.mixed, .progressive, .full)
+- `ImmersionStyle.progressive(_:initialAmount:aspectRatio:)` - Progressive with custom range
+- `Scene.immersionStyle(selection:in:)` - Scene modifier for immersion control
+- `.progressive(aspectRatio: .portrait)` - Portrait aspect ratio for vertical experiences
+
+#### Surface & Anchoring
+- `SurfaceSnappingInfo` - Surface detection and snapping information
+- `WorldAnchor` - Persistent world-anchored content with sharing
+- `WorldRecenterPhase` - World tracking states
+- `attachmentAnchor` - 3D positioning for ornaments
+- `handAnchor` - Hand tracking anchor points (Beta)
+
+#### Scene Control
+- `Scene.persistentSystemOverlays(_:)` - Control system overlay visibility
+- `VolumeBaseplateVisibility` - Volume baseplate display control
+- `upperLimbVisibility` - Control hand occlusion visibility
+- `handTrackingEnabled` - Enable/disable hand tracking
+- `persistentIdentifier` - Persistent content identification
+
+#### Environment & Rendering
+- `immersiveEnvironmentBehavior(_:)` - Control environment blending
+- `spatialOverlay` - AR overlay capabilities
+- `EnvironmentRenderingColor` - Environment color rendering (Beta)
+- `VolumetricBasePlate` - Volume base display element (Beta)
 
 ## Best Practices
 
