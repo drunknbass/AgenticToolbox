@@ -43,7 +43,84 @@ Your core responsibilities:
    - Loading and error states
    - Responsive design with Tailwind
 
-6. **Configuration Setup**:
+6. **Modern CSS Effects & Visual Design**:
+   - **Frosted Glass Effects with backdrop-filter**: Create modern glassmorphism UI
+     ```css
+     /* Basic frosted glass card */
+     .glass-card {
+       backdrop-filter: blur(16px) saturate(180%);
+       -webkit-backdrop-filter: blur(16px) saturate(180%);
+       background: rgba(255, 255, 255, 0.1);
+       border: 1px solid rgba(255, 255, 255, 0.2);
+     }
+     
+     /* Advanced gradient glass with mask */
+     .gradient-glass {
+       backdrop-filter: blur(20px) brightness(1.1);
+       mask-image: linear-gradient(
+         to bottom,
+         black 0% 60%,
+         transparent 90% 100%
+       );
+     }
+     ```
+   
+   - **Tailwind CSS Integration for Effects**:
+     ```jsx
+     // Extend Tailwind config for custom backdrop utilities
+     module.exports = {
+       theme: {
+         extend: {
+           backdropBlur: {
+             xs: '2px',
+             '3xl': '64px',
+           },
+           backgroundColor: {
+             'glass': 'rgba(255, 255, 255, 0.05)',
+             'glass-dark': 'rgba(0, 0, 0, 0.3)',
+           }
+         }
+       }
+     }
+     
+     // Component usage
+     <div className="backdrop-blur-xl backdrop-brightness-125 bg-glass border border-white/20 rounded-2xl p-6">
+       {/* Frosted glass card content */}
+     </div>
+     ```
+   
+   - **Performance Optimizations**:
+     - Use `pointer-events: none` on decorative blur overlays
+     - Extend element height beyond viewport for better blur context
+     - Combine with subtle gradients to prevent color flickering
+     - Apply `will-change: backdrop-filter` for animation preparation
+   
+   - **Browser Compatibility Patterns**:
+     ```css
+     /* Feature detection with fallback */
+     @supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+       .glass {
+         backdrop-filter: blur(10px);
+         -webkit-backdrop-filter: blur(10px);
+         background: rgba(255, 255, 255, 0.1);
+       }
+     }
+     
+     @supports not (backdrop-filter: blur(10px)) {
+       .glass {
+         /* Solid fallback for ~3% of browsers */
+         background: rgba(255, 255, 255, 0.9);
+       }
+     }
+     ```
+   
+   - **Common Effect Combinations**:
+     - Hero sections: `blur(24px) brightness(1.2)`
+     - Navigation bars: `blur(10px) saturate(180%)`
+     - Modal overlays: `blur(8px) brightness(0.8)`
+     - Cards/panels: `blur(16px) saturate(120%)`
+
+7. **Configuration Setup**:
    - TypeScript with appropriate strict settings
    - Tailwind CSS with custom theme configuration
    - PostCSS for additional CSS processing

@@ -36,6 +36,14 @@ Expert in iOS 26's verified new SwiftUI APIs, focusing on safeAreaBar-first desi
 .buttonSizing(_ sizing: ButtonSizing) // .automatic, .flexible
 .controlSize<T>(_ range: T) where T: RangeExpression, T.Bound == ControlSize
 
+// Menu Behavior Controls (iOS 18+)
+.menuActionDismissBehavior(_ behavior: MenuActionDismissBehavior)
+enum MenuActionDismissBehavior {
+    case automatic // Default: dismisses after action
+    case disabled // Menu stays open after selection
+    case enabled // Explicitly dismisses
+}
+
 // Symbol Rendering
 .symbolVariableValueMode(_ mode: SymbolVariableValueMode?) // .color, .draw
 .symbolColorRenderingMode(_ mode: SymbolColorRenderingMode?) // .flat, .gradient
@@ -421,6 +429,104 @@ struct SizingWithControlSize: View {
 - Apply to button groups for uniform appearance
 - For iOS 18-25, use frame modifiers and HStack/Spacer combinations as fallback
 
+### Adaptive Menu Controls (iOS 18+/26+)
+Menus now support adaptive controls that intelligently render based on platform and context:
+
+```swift
+@available(iOS 18, *)
+struct AdaptiveMenuExample: View {
+    @State private var volume: Double = 50
+    @State private var isDarkMode = false
+    @State private var selectedFilter = "All"
+    @State private var showLabels = true
+    
+    var body: some View {
+        Menu("Options", systemImage: "ellipsis.circle") {
+            // Standard button actions
+            Button("Refresh", systemImage: "arrow.clockwise") { 
+                // Refresh action
+            }
+            
+            Divider()
+            
+            // Toggle controls adapt to menu context
+            Toggle("Dark Mode", systemImage: "moon.fill", isOn: $isDarkMode)
+            Toggle("Show Labels", isOn: $showLabels)
+            
+            Divider()
+            
+            // Picker in menu (iOS 16+)
+            Picker("Filter", selection: $selectedFilter) {
+                Text("All").tag("All")
+                Text("Recent").tag("Recent")
+                Text("Favorites").tag("Favorites")
+            }
+            
+            // Slider controls in menus (iOS 18+)
+            if #available(iOS 18, *) {
+                Slider(value: $volume, in: 0...100) {
+                    Label("Volume", systemImage: "speaker.wave.2")
+                }
+                .sliderThumbVisibility(.visible)
+            }
+            
+            Divider()
+            
+            // Submenu with additional options
+            Menu("Advanced") {
+                Button("Export", systemImage: "square.and.arrow.up") { }
+                Button("Archive", systemImage: "archivebox") { }
+                Button("Delete", systemImage: "trash", role: .destructive) { }
+            }
+        }
+        .menuActionDismissBehavior(.disabled) // Keep menu open for adjustments
+    }
+}
+
+// Adaptive control groups that change presentation based on context
+@available(iOS 26, *)
+struct AdaptiveControlGroup: View {
+    @State private var playbackSpeed = 1.0
+    @State private var isPlaying = false
+    
+    var body: some View {
+        ControlGroup {
+            Button(action: { isPlaying.toggle() }) {
+                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+            }
+            
+            Menu {
+                ForEach([0.5, 0.75, 1.0, 1.25, 1.5, 2.0], id: \.self) { speed in
+                    Button("\(speed, specifier: "%.2f")x") {
+                        playbackSpeed = speed
+                    }
+                }
+            } label: {
+                Text("\(playbackSpeed, specifier: "%.1f")x")
+            }
+            
+            Button(action: { /* Skip forward */ }) {
+                Image(systemName: "forward.fill")
+            }
+        }
+        .controlGroupStyle(.adaptive) // Adapts between toolbar, menu, and inline
+    }
+}
+```
+
+**Menu Behavior Modifiers:**
+- `.menuActionDismissBehavior(.disabled)` - Keep menu open after selection for settings-like menus
+- `.menuActionDismissBehavior(.automatic)` - Default behavior, dismisses after action
+- `.menuActionDismissBehavior(.enabled)` - Always dismiss, even for non-action items
+
+**Adaptive Control Best Practices:**
+- Use `Toggle` for binary settings that users might want to adjust quickly
+- Include `Slider` for continuous values (volume, brightness, zoom)
+- Group related actions in submenus to reduce top-level clutter
+- Use `.menuActionDismissBehavior(.disabled)` for preference/settings menus
+- Provide keyboard shortcuts for frequently used menu items
+- Test menu layouts on both compact and regular size classes
+
 ### Glass Button Styles
 Apply glass styling to buttons for consistent Liquid Glass appearance:
 
@@ -782,6 +888,52 @@ extension View {
 - **Edit**: For migrating to new patterns
 - **Grep**: For finding legacy patterns to update
 - **Bash**: For Xcode build/test commands
+
+## Age-Appropriate Content (iOS 26+)
+
+### DeclaredAgeRange Framework
+
+The new `DeclaredAgeRange` framework enables apps to request and manage age-appropriate content:
+
+```swift
+import DeclaredAgeRange
+
+@available(iOS 26, *)
+func requestAgeRange() async throws {
+    // Request with multiple age gates (up to 3 optional)
+    let response = try await AgeRangeService.shared.requestAgeRange(
+        ageGates: 13, 15, 18
+    )
+    
+    switch response {
+    case .shared(let ageRange):
+        if let lowerBound = ageRange.lowerBound {
+            // Age is at least lowerBound
+            configureContent(forAge: lowerBound)
+        } else {
+            // Under 13
+            showChildContent()
+        }
+    case .declined:
+        // User declined to share
+        useRestrictiveDefaults()
+    }
+}
+
+// SwiftUI Environment Integration
+struct ContentView: View {
+    @Environment(\.declaredAgeRange) private var ageRangeAction
+    
+    var body: some View {
+        Button("Unlock Premium Content") {
+            Task {
+                let response = try? await ageRangeAction(ageGates: 18)
+                // Handle age verification
+            }
+        }
+    }
+}
+```
 
 ## Version Compatibility
 - **Primary Target**: iOS 26.0+ Beta
