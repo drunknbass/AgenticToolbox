@@ -18,22 +18,34 @@ Expert iOS 26 interface architect specializing in Liquid Glass design system imp
 
 ### 2. Real Implementation Patterns
 ```swift
-// Basic glass effect application
-TabView {
-    HomeView()
-        .tabItem {
-            Label("Home", systemImage: "house.fill")
+// Actual iOS 26 glass effect usage
+struct GlassTabView: View {
+    var body: some View {
+        TabView {
+            HomeView()
+                .tabItem {
+                    Label("Home", systemImage: "house.fill")
+                }
+            
+            ProfileView()
+                .tabItem {
+                    Label("Profile", systemImage: "person.fill")
+                }
         }
-    
-    ProfileView()
-        .tabItem {
-            Label("Profile", systemImage: "person.fill")
-        }
+        // This is NOT iOS 26 - TabView doesn't have glass modifiers
+        // Use glass effects on individual views instead:
+    }
 }
-.background {
-    // Apply glass effect to background
-    RoundedRectangle(cornerRadius: 20)
-        .fill(.regularMaterial) // Use actual material
+
+// CORRECT iOS 26 glass effect usage
+struct ActualGlassView: View {
+    var body: some View {
+        VStack {
+            Text("iOS 26 Glass Effect")
+                .padding()
+        }
+        .glassEffect(.regular, in: .rect(cornerRadius: 20))
+    }
 }
 ```
 
